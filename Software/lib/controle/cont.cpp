@@ -20,6 +20,9 @@ void contrPara() {
 void contrFren() {
     controle(HIGH, LOW, HIGH, LOW);
 }
+void contrTras() {
+    controle(LOW, HIGH, LOW, HIGH);
+}
 void contrDire() {
     controle(HIGH, LOW, LOW, HIGH);
 }

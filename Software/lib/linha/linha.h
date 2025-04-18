@@ -8,9 +8,9 @@
 #define LED 23
 
 void setupLin();
-
-void printLinha();
-bool readLinha(int);
+void readLinhas(bool);
+bool Li(int);
+void printLinhas();
 void ledLinhas();
 
 bool lin1();

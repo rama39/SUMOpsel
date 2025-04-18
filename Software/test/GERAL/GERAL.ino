@@ -28,7 +28,7 @@ void loop() {
   digitalWrite(A2, HIGH);
   digitalWrite(B1, LOW);
   digitalWrite(B2, HIGH);
-  printLinha();
+  printLinhas();
   ledLinhas();
   readSensores(true);
   delay(2000);
@@ -38,7 +38,7 @@ void loop() {
   digitalWrite(A2, LOW);
   digitalWrite(B1, HIGH);
   digitalWrite(B2, LOW);
-  printLinha();
+  printLinhas();
   ledLinhas();
   readSensores(true);
   delay(2000);
@@ -48,7 +48,7 @@ void loop() {
   digitalWrite(A2, LOW);
   digitalWrite(B1, LOW);
   digitalWrite(B2, LOW);
-  printLinha();
+  printLinhas();
   ledLinhas();
   readSensores(true);
   delay(2000);

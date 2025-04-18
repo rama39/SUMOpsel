@@ -22,35 +22,37 @@ void setup() {
 
 void loop() {
 
-  // PONTE H
   Serial.println("---");
-  digitalWrite(A1, LOW);
-  digitalWrite(A2, HIGH);
-  digitalWrite(B1, LOW);
-  digitalWrite(B2, HIGH);
-  printLinha();
-  ledLinhas();
   readSensores(true);
-  delay(2000);
+  readLinhas(true);
 
-  Serial.println("---");
-  digitalWrite(A1, HIGH);
-  digitalWrite(A2, LOW);
-  digitalWrite(B1, HIGH);
-  digitalWrite(B2, LOW);
-  printLinha();
-  ledLinhas();
-  readSensores(true);
-  delay(2000);
+  if(TARGET(measure2)) {
+    contrFren();
+    goto skip;
+  }
+  if(TARGET(measure1)) {
+    contrEsqu();
+    goto skip;
+  }
+  if(TARGET(measure3)) {
+    contrDire();
+    goto skip;
+  }
 
-  Serial.println("---");
-  digitalWrite(A1, LOW);
-  digitalWrite(A2, LOW);
-  digitalWrite(B1, LOW);
-  digitalWrite(B2, LOW);
-  printLinha();
-  ledLinhas();
-  readSensores(true);
-  delay(2000);
+  if(linha1) {
+    contrTras();
+    goto skip;
+  }
+  if(linha2) {
+    contrFren();
+    goto skip;
+  }
+
+
+
+
+
+  skip:
+  delay(10);
 
 }

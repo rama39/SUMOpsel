@@ -74,6 +74,12 @@ int mm(const VL53L0X_RangingMeasurementData_t *measure) {
   return measure->RangeMilliMeter;
 }
 
+// TODO: fazer certo
+#define TARGET(x) target(&x)
+bool target(const VL53L0X_RangingMeasurementData_t *measure) {
+  return measure1.RangeStatus == 4 || mm(measure) < 100;
+}
+
 void readSensores(bool print) {
   
   lox1.rangingTest(&measure1, false); // pass in 'true' to get debug data printout!
