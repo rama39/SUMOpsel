@@ -1,3 +1,6 @@
+/*
+    Biblioteca para controle dos motores do robô com ponte H l298n mini
+*/
 
 #define A1 25
 #define A2 26
