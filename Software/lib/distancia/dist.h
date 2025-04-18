@@ -18,6 +18,6 @@
 void setupDist();
 
 void setID();
-void read_triple_sensors();
+void readSensores(bool);
 
 #include "dist.cpp"

@@ -68,39 +68,47 @@ void setID() {
 
 }
 
-void read_triple_sensors() {
+// retorna leitura do sensor em milimetros
+#define MM(x) mm(&x)
+int mm(const VL53L0X_RangingMeasurementData_t *measure) {
+  return measure->RangeMilliMeter;
+}
+
+void readSensores(bool print) {
   
   lox1.rangingTest(&measure1, false); // pass in 'true' to get debug data printout!
   lox2.rangingTest(&measure2, false); // pass in 'true' to get debug data printout!
   lox3.rangingTest(&measure3, false); // pass in 'true' to get debug data printout!
 
+  if(!print) return;
+
   // print sensor one reading
   Serial.print("1: ");
   if(measure1.RangeStatus != 4) {     // if not out of range
-    Serial.print(measure1.RangeMilliMeter);
+    Serial.print(MM(measure1));
   } else {
-    Serial.print(F("Out of range"));
+    Serial.print("Out of range");
   }
   
   Serial.print(" ");
 
   // print sensor two reading
-  Serial.print(F("2: "));
+  Serial.print("2: ");
   if(measure2.RangeStatus != 4) {
-    Serial.print(measure2.RangeMilliMeter);
+    Serial.print(MM(measure2));
   } else {
-    Serial.print(F("Out of range"));
+    Serial.print("Out of range");
   }
   
-  Serial.print(F(" "));
+  Serial.print(" ");
 
   // print sensor three reading
-  Serial.print(F("3: "));
+  Serial.print("3: ");
   if(measure3.RangeStatus != 4) {
-    Serial.print(measure3.RangeMilliMeter);
+    Serial.print(MM(measure3));
   } else {
-    Serial.print(F("Out of range"));
-  }/**/
+    Serial.print("Out of range");
+  }
   
   Serial.println();
 }

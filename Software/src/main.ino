@@ -30,7 +30,7 @@ void loop() {
   digitalWrite(B2, HIGH);
   printLinha();
   ledLinhas();
-  read_triple_sensors();
+  readSensores(true);
   delay(2000);
 
   Serial.println("girando para ca");
@@ -40,7 +40,7 @@ void loop() {
   digitalWrite(B2, LOW);
   printLinha();
   ledLinhas();
-  read_triple_sensors();
+  readSensores(true);
   delay(2000);
 
   Serial.println("parou");
@@ -50,7 +50,7 @@ void loop() {
   digitalWrite(B2, LOW);
   printLinha();
   ledLinhas();
-  read_triple_sensors();
+  readSensores(true);
   delay(2000);
 
 }
