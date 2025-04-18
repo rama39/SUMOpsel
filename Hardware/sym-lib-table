@@ -1,0 +1,4 @@
+(sym_lib_table
+  (version 7)
+  (lib (name "Biblioteca_Esquematicos")(type "KiCad")(uri "${KIPRJMOD}/Biblioteca_Esquematicos.kicad_sym")(options "")(descr ""))
+)
