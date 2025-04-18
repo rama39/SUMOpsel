@@ -23,7 +23,7 @@ void setup() {
 void loop() {
 
   // PONTE H
-  Serial.println("girando para la");
+  Serial.println("---");
   digitalWrite(A1, LOW);
   digitalWrite(A2, HIGH);
   digitalWrite(B1, LOW);
@@ -33,7 +33,7 @@ void loop() {
   readSensores(true);
   delay(2000);
 
-  Serial.println("girando para ca");
+  Serial.println("---");
   digitalWrite(A1, HIGH);
   digitalWrite(A2, LOW);
   digitalWrite(B1, HIGH);
@@ -43,7 +43,7 @@ void loop() {
   readSensores(true);
   delay(2000);
 
-  Serial.println("parou");
+  Serial.println("---");
   digitalWrite(A1, LOW);
   digitalWrite(A2, LOW);
   digitalWrite(B1, LOW);

@@ -6,6 +6,7 @@
 
 void setupContr();
 
+void controle(int,int,int,int);
 void contrPara();
 void contrFren();
 void contrDire();
