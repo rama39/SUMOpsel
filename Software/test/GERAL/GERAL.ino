@@ -1,35 +1,38 @@
+//================================================================================================
+
+// Definição de pinos
+
+#define DIST_XSHUT_1 5
+#define DIST_XSHUT_2 17
+#define DIST_XSHUT_3 16
+
+#define LIN1 4
+#define LIN2 13
+
+#define A1 25
+#define A2 26
+#define B1 27
+#define B2 14
+
+#define IR 15
+
+#define LED 23
+
+#define RADIO 32
 
 //================================================================================================
-//================================================================================================
-// Biblio dos VL53L0X
-/*
-    Biblioteca que controla a incialização e leitura de três sensores TOF VL53L0X
-*/
 
-// Usa biblioteca Adafruit como base
+// Sensores de distância
+
+// Configuração de endereço i2c implementada neste link, eu só extrapolei para 3 sensores
+//   https://github.com/adafruit/Adafruit_VL53L0X/blob/master/examples/vl53l0x_dual/vl53l0x_dual.ino
+
 #include "Adafruit_VL53L0X.h"
 
-// pin number 
-#define DIST_XSHUT_1 4
-#define DIST_XSHUT_2 2
-#define DIST_XSHUT_3 15
-
-// address we will assign sensors
+// address we will assign if dual sensor is present
 #define LOX1_ADDRESS 0x30
 #define LOX2_ADDRESS 0x31
 #define LOX3_ADDRESS 0x32
-
-void setupDist();
-
-void setID();
-void readSensores(bool);
-
-//------------------------------------------------------------------------------------------------
-/*
-  Quase igual ao código encontrado em:
-  https://github.com/adafruit/Adafruit_VL53L0X/blob/master/examples/vl53l0x_dual/vl53l0x_dual.ino
-  <3 obg comunidade open source 🤝 <3
-*/
 
 // objects for the vl53l0x
 Adafruit_VL53L0X lox1 = Adafruit_VL53L0X();
@@ -41,17 +44,23 @@ VL53L0X_RangingMeasurementData_t measure1;
 VL53L0X_RangingMeasurementData_t measure2;
 VL53L0X_RangingMeasurementData_t measure3;
 
+void setupDist();
+void readDist();
+void _printDistInd(string, VL53L0X_RangingMeasurementData_t &);
+void printDist();
+
 void setupDist() {
+  
+  // Configura pinos xshut
   pinMode(DIST_XSHUT_1, OUTPUT);
   pinMode(DIST_XSHUT_2, OUTPUT);
   pinMode(DIST_XSHUT_3, OUTPUT);
-
+  
+  // Configura I2C
   Wire.begin(21, 22); 
 
-  setID();
-}
+  // Configura ID de cada sensor VL53L0X
 
-void setID() {
   // all reset
   digitalWrite(DIST_XSHUT_1, LOW);    
   digitalWrite(DIST_XSHUT_2, LOW);
@@ -82,7 +91,6 @@ void setID() {
     Serial.println(F("Failed to boot second VL53L0X"));
     while(1);
   }
-  delay(10);
 
   // activating LOX3
   digitalWrite(DIST_XSHUT_3, HIGH);
@@ -94,216 +102,200 @@ void setID() {
   }
 
 }
-
-// retorna leitura do sensor em milimetros
-#define MM(x) mm(&x)
-int mm(const VL53L0X_RangingMeasurementData_t *measure) {
-  return measure->RangeMilliMeter;
-}
-
-// TODO: fazer certo
-#define TARGET(x) target(&x)
-bool target(const VL53L0X_RangingMeasurementData_t *measure) {
-  return measure1.RangeStatus == 4 || mm(measure) < 100;
-}
-
-void readSensores(bool print) {
+void readDist() {
   
   lox1.rangingTest(&measure1, false); // pass in 'true' to get debug data printout!
   lox2.rangingTest(&measure2, false); // pass in 'true' to get debug data printout!
   lox3.rangingTest(&measure3, false); // pass in 'true' to get debug data printout!
 
-  if(!print) return;
+}
+
+void _printDistInd(string nome, VL53L0X_RangingMeasurementData_t &measurex) {
+
+  // print sensor reading
+  Serial.print(nome);
+  Serial.print(": ");
+  if(measurex.RangeStatus != 4) {     // if not out of range
+    Serial.print(measurex.RangeMilliMeter);
+  } else {
+    Serial.print("Out of range");
+  }
+  
+  Serial.print(" ");
+}
+void printDist() {
 
   // print sensor one reading
-  Serial.print("1: ");
-  if(measure1.RangeStatus != 4) {     // if not out of range
-    Serial.print(MM(measure1));
-  } else {
-    Serial.print("Out of range");
-  }
-  
-  Serial.print(" ");
+  _printDistInd("1", measure1);
 
   // print sensor two reading
-  Serial.print("2: ");
-  if(measure2.RangeStatus != 4) {
-    Serial.print(MM(measure2));
-  } else {
-    Serial.print("Out of range");
-  }
-  
-  Serial.print(" ");
+  _printDistInd("2", measure2);
 
   // print sensor three reading
-  Serial.print("3: ");
-  if(measure3.RangeStatus != 4) {
-    Serial.print(MM(measure3));
-  } else {
-    Serial.print("Out of range");
-  }
+  _printDistInd("3", measure3);
   
   Serial.println();
+
 }
+
 //================================================================================================
-//================================================================================================
 
-// Biblio dos QRE1113
-/*
-Biblioteca simples para leitura de dois sensores de linha QRE1113
-*/
+// Sensores de linha
 
-#define LIN1 35
-#define LIN2 34
+#define boolLinha(leitura) ((leitura) < 2000);
 
-#define LED 23
+bool linha1, linha2;
 
-void setupLin();
-void readLinhas(bool);
-bool Li(int);
+void readLinhas();
 void printLinhas();
-void ledLinhas();
+//void ledLinhas();
 
-bool lin1();
-bool lin2();
-
-//------------------------------------------------------------------------------------------------
-
-int linha1, linha2;
-
-void setupLin(){
-    pinMode(LIN1, INPUT);
-    pinMode(LIN2, INPUT);
-
-    pinMode(LED, OUTPUT);
+void readLinhas() {
+  linha1 = boolLinha(analogRead(LIN1));
+  linha2 = boolLinha(analogRead(LIN2));
 }
 
-void readLinhas(bool print) {
-    linha1 = analogRead(LIN1);
-    linha2 = analogRead(LIN2);
-    if(print) printLinhas();
-}
-bool Li(int linhai) {
-    return linhai > 2000;
-}
 void printLinhas() {
-    // TODO usar F("")
-    Serial.print("linha: ");
-    Serial.print(linha1);
-    Serial.print(" ");
-    Serial.println(linha2);
-}
-void ledLinhas() {
-    analogWrite(LED, 120*readLinha(linha1)+120*readLinha(linha2));
+  //TODO: aprender formatação de string pra printar mais facil
+  Serial.print("linha: ");
+  Serial.print(analogRead(LIN1));
+  Serial.print(" ");
+  Serial.println(analogRead(LIN2));
 }
 
-bool lin1() {
-    return linha1 > 2000;
-}
-bool lin2() {
-    return linha2 > 2000;
-}
+/*void ledLinhas() {
+  analogWrite(LED, 120*readLinha(linha1)+120*readLinha(linha2));
+}*/
 
 //================================================================================================
-//================================================================================================
 
-// Biblio do controle dos motores
-/*
-    Biblioteca para controle dos motores do robô com ponte H l298n mini
-*/
+// Controle dos motores
 
-#define A1 25
-#define A2 26
-#define B1 27
-#define B2 14
+void setupCont(); //serving cont
+void escreve(int, int, int, int);
 
-void setupContr();
-
-void controle(int,int,int,int);
-void contrPara();
-void contrFren();
-void contrDire();
-void contrEsqu();
-
-//------------------------------------------------------------------------------------------------
-
-void setupContr() {
+void setupCont() {
   pinMode(A1, OUTPUT);
   pinMode(A2, OUTPUT);
   pinMode(B1, OUTPUT);
   pinMode(B2, OUTPUT);
 }
 
-void controle(int IN1, int IN2, int IN3, int IN4) {
-  digitalWrite(A1, IN1);
-  digitalWrite(A2, IN2);
-  digitalWrite(B1, IN3);
-  digitalWrite(B2, IN4);
+void escreve(int _A1, int _A2, int _B1, int _B2) {
+  digitalWrite(A1, _A1);
+  digitalWrite(A2, _A2);
+  digitalWrite(B1, _B1);
+  digitalWrite(B2, _B2);
 }
 
-// TODO: achar valores que façam sentido pra isso (testando)
-void contrPara() {
-  controle(LOW, LOW, LOW, LOW);
+void frente() {
+  Serial.println("frente");
+  escreve(LOW, HIGH, LOW, HIGH);
 }
-void contrFren() {
-  controle(HIGH, LOW, HIGH, LOW);
+
+void reverso() {
+  Serial.println("reverso");
+  escreve(HIGH, LOW, HIGH, LOW);
 }
-void contrTras() {
-  controle(LOW, HIGH, LOW, HIGH);
-}
-void contrDire() {
-  controle(HIGH, LOW, LOW, HIGH);
-}
-void contrEsqu() {
-  controle(LOW, HIGH, HIGH, LOW);
+
+void para() {
+  Serial.println("parou");
+  escreve(LOW, LOW, LOW, LOW);
 }
 
 //================================================================================================
+
+// Sensor IR (Infravermelho)
+
+// Versão reduzida deste código:
+// https://github.com/Arduino-IRremote/Arduino-IRremote/blob/master/examples/SimpleReceiver/SimpleReceiver.ino
+
+#include <Arduino.h>
+#include <IRremote.h>
+
+#define comandoIr IrReceiver.decodedIRData.command
+
+bool ON = false;
+
+void setupIr();
+void updateOn();
+void runIr();
+
+void setupIr() {
+  IrReceiver.begin(IR, true);
+}
+
+void updateOn() {
+  switch (comandoIr) {
+    case 0x3:
+      ON = true;
+    break;
+    case 0x2:
+      ON = false;
+    break;
+    default:break;
+  }
+  digitalWrite(LED, ON ? HIGH : LOW);
+}
+
+void runIr() {
+  if (IrReceiver.decode())
+    IrReceiver.resume(),
+    updateOn();
+}
+
 //================================================================================================
+
+// 'main'
 
 void setup() {
   
   Serial.begin(9600);
 
-  setupContr();
+  pinMode(LED, OUTPUT);
 
-  setupLin();
+  pinMode(LIN1, INPUT);
+  pinMode(LIN2, INPUT);
+
+  setupCont();
 
   setupDist();
+  
+  setupIr();
 
 }
 
+
 void loop() {
 
-  // PONTE H
-  Serial.println("---");
-  digitalWrite(A1, LOW);
-  digitalWrite(A2, HIGH);
-  digitalWrite(B1, LOW);
-  digitalWrite(B2, HIGH);
-  printLinhas();
-  ledLinhas();
-  readSensores(true);
-  delay(2000);
+  static int test_mode = 0;
+  if(ON) {
+    // PONTE H
+    switch(test_mode) {
+      case 0:
+        frente();
+      break; case 1:
+        reverso();
 
-  Serial.println("---");
-  digitalWrite(A1, HIGH);
-  digitalWrite(A2, LOW);
-  digitalWrite(B1, HIGH);
-  digitalWrite(B2, LOW);
-  printLinhas();
-  ledLinhas();
-  readSensores(true);
-  delay(2000);
+      break; case 2:
+        para();
+    }
+    test_mode++;
+    if(test_mode == 3) test_mode = 0;
 
-  Serial.println("---");
-  digitalWrite(A1, LOW);
-  digitalWrite(A2, LOW);
-  digitalWrite(B1, LOW);
-  digitalWrite(B2, LOW);
-  printLinhas();
-  ledLinhas();
-  readSensores(true);
-  delay(2000);
+    readLinhas();
+    printLinhas();
+
+    readDist();
+    printDist();
+
+    delay(500);
+  }
+  else {
+    para();
+  }
+
+  runIr();
+  delay(25);
 
 }
