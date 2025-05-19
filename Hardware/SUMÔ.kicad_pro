@@ -48,7 +48,7 @@
         "silk_text_thickness": 0.1,
         "silk_text_upright": false,
         "zones": {
-          "min_clearance": 0.5
+          "min_clearance": 1.0
         }
       },
       "diff_pair_dimensions": [
@@ -234,7 +234,15 @@
     },
     "layer_pairs": [],
     "layer_presets": [],
-    "viewports": []
+    "viewports": [
+      {
+        "h": 52907949.71992163,
+        "name": "a",
+        "w": 104594223.86904581,
+        "x": 94614902.29982845,
+        "y": 47426738.14497578
+      }
+    ]
   },
   "boards": [],
   "cvpcb": {
@@ -504,7 +512,7 @@
       "plot": "",
       "pos_files": "",
       "specctra_dsn": "",
-      "step": "",
+      "step": "SUMÔ.stl",
       "svg": "",
       "vrml": "SUMÔ.wrl"
     },
