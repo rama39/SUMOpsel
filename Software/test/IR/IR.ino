@@ -1,48 +1,51 @@
+//================================================================================================
 
 // Biblio do sensor infra vermelho ky022
 
-#include <Arduino.h>
-#include <IRremote.h> // include the library
+// Versão reduzida deste código:
+// https://github.com/Arduino-IRremote/Arduino-IRremote/blob/master/examples/SimpleReceiver/SimpleReceiver.ino
 
 #define IR 15
 #define LED 23
 
-void setupIr();
-void updateIr();
-void runIr();
-uint16_t commandIr();
+#include <Arduino.h>
+#include <IRremote.h> // include the library
 
-void setupIr(){
-
-  IrReceiver.begin(IR, true);
-
-  pinMode(LED, OUTPUT);
-
-}
+#define comandoIr IrReceiver.decodedIRData.command
 
 bool ON = false;
 
-void updateIr() {
-  if (commandIr() == 0x3) {
-    ON = true;
-  } else if (commandIr() == 0x02) {
-    ON = false;
+void setupIr();
+void updateOn();
+void runIr();
+
+void setupIr(){
+  IrReceiver.begin(IR, true);
+  pinMode(LED, OUTPUT);
+}
+
+void updateOn() {
+  switch (comandoIr) {
+    case 0x3:
+      ON = true;
+    break;
+    case 0x2:
+      ON = false;
+    break;
+    default:break;
   }
+  digitalWrite(LED, ON ? HIGH : LOW);
 }
 
 void runIr() {
 
   if (IrReceiver.decode())
     IrReceiver.resume(), // Early enable receiving of the next IR frame
-    updateIr();
+    updateOn();
 
 }
 
-uint16_t commandIr() {
-  return IrReceiver.decodedIRData.command;
-}
-
-
+//================================================================================================
 
 void setup() {
   
@@ -55,9 +58,8 @@ void setup() {
 void loop() {
 
   runIr();
-
-  digitalWrite(LED, ON ? HIGH : LOW);
-
   delay(10);
 
 }
+
+//================================================================================================

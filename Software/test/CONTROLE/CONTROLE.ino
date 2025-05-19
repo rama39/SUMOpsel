@@ -1,10 +1,9 @@
 
 //================================================================================================
-//================================================================================================
 
 // Biblio do controle dos motores
 /*
-    Biblioteca para controle dos motores do robô com ponte H l298n mini
+  Biblioteca para controle dos motores do robô com ponte H l298n mini
 */
 
 #define A1 25
@@ -12,48 +11,45 @@
 #define B1 27
 #define B2 14
 
-void setupContr();
+void setupCont();
+void escreve(int, int, int, int);
+void frente();
+void reverso();
+void direita();
+void esquerda();
+void para();
 
-void controle(int,int,int,int);
-void contrPara();
-void contrFren();
-void contrDire();
-void contrEsqu();
-
-//------------------------------------------------------------------------------------------------
-
-void setupContr() {
+void setupCont() {
   pinMode(A1, OUTPUT);
   pinMode(A2, OUTPUT);
   pinMode(B1, OUTPUT);
   pinMode(B2, OUTPUT);
 }
 
-void controle(int IN1, int IN2, int IN3, int IN4) {
-  digitalWrite(A1, IN1);
-  digitalWrite(A2, IN2);
-  digitalWrite(B1, IN3);
-  digitalWrite(B2, IN4);
+void escreve(int _A1, int _A2, int _B1, int _B2) {
+  digitalWrite(A1, _A1);
+  digitalWrite(A2, _A2);
+  digitalWrite(B1, _B1);
+  digitalWrite(B2, _B2);
 }
 
-// TODO: achar valores que façam sentido pra isso (testando)
-void contrPara() {
-  controle(LOW, LOW, LOW, LOW);
-}
-void contrFren() {
-  controle(HIGH, LOW, HIGH, LOW);
-}
-void contrTras() {
-  controle(LOW, HIGH, LOW, HIGH);
-}
-void contrDire() {
-  controle(HIGH, LOW, LOW, HIGH);
-}
-void contrEsqu() {
-  controle(LOW, HIGH, HIGH, LOW);
+// TODO: achar valores que façam sentido pra isso
+
+void frente() {
+  Serial.println("frente");
+  escreve(LOW, HIGH, LOW, HIGH);
 }
 
-//================================================================================================
+void reverso() {
+  Serial.println("reverso");
+  escreve(HIGH, LOW, HIGH, LOW);
+}
+
+void para() {
+  Serial.println("parou");
+  escreve(LOW, LOW, LOW, LOW);
+}
+
 //================================================================================================
 
 void setup() {
@@ -65,28 +61,22 @@ void setup() {
 }
 
 void loop() {
-  // put your main code here, to run repeatedly:
 
-  // PONTE H
-  Serial.println("girando para la");
-  digitalWrite(A1, LOW);
-  digitalWrite(A2, HIGH);
-  digitalWrite(B1, LOW);
-  digitalWrite(B2, HIGH);
-  delay(2000);
+  static int test_mode = 0;
+  
+  switch(test_mode) {
+    case 0:
+      frente();
+    break; case 1:
+      reverso();
 
-  Serial.println("girando para ca");
-  digitalWrite(A1, HIGH);
-  digitalWrite(A2, LOW);
-  digitalWrite(B1, HIGH);
-  digitalWrite(B2, LOW);
-  delay(2000);
+    break; default:
+      para();
+  }
 
-  Serial.println("parou");
-  digitalWrite(A1, LOW);
-  digitalWrite(A2, LOW);
-  digitalWrite(B1, LOW);
-  digitalWrite(B2, LOW);
-  delay(2000);
+  test_mode++;
+  if(test_mode == 3) test_mode = 0;
 
 }
+
+//================================================================================================

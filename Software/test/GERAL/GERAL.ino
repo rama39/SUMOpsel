@@ -46,7 +46,7 @@ VL53L0X_RangingMeasurementData_t measure3;
 
 void setupDist();
 void readDist();
-void _printDistInd(string, VL53L0X_RangingMeasurementData_t &);
+void _printDistInd(string nome, VL53L0X_RangingMeasurementData_t &);
 void printDist();
 
 void setupDist() {
@@ -100,8 +100,8 @@ void setupDist() {
     Serial.println(F("Failed to boot third VL53L0X"));
     while(1);
   }
-
 }
+
 void readDist() {
   
   lox1.rangingTest(&measure1, false); // pass in 'true' to get debug data printout!
@@ -173,6 +173,9 @@ void printLinhas() {
 
 void setupCont(); //serving cont
 void escreve(int, int, int, int);
+void frente();
+void reverso();
+void para();
 
 void setupCont() {
   pinMode(A1, OUTPUT);
@@ -265,7 +268,6 @@ void setup() {
 
 }
 
-
 void loop() {
 
   static int test_mode = 0;
@@ -277,7 +279,7 @@ void loop() {
       break; case 1:
         reverso();
 
-      break; case 2:
+      break; default:
         para();
     }
     test_mode++;
@@ -299,3 +301,5 @@ void loop() {
   delay(25);
 
 }
+
+//================================================================================================

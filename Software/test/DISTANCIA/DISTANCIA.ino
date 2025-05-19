@@ -1,18 +1,17 @@
 
 //================================================================================================
-//================================================================================================
 // Biblio dos VL53L0X
 /*
-    Biblioteca que controla a incialização e leitura de três sensores TOF VL53L0X
+  Biblioteca que controla a incialização e leitura de três sensores TOF VL53L0X
 */
+
+// pin number 
+#define DIST_XSHUT_1 5
+#define DIST_XSHUT_2 17
+#define DIST_XSHUT_3 16
 
 // Usa biblioteca Adafruit como base
 #include "Adafruit_VL53L0X.h"
-
-// pin number 
-#define DIST_XSHUT_1 4
-#define DIST_XSHUT_2 2
-#define DIST_XSHUT_3 15
 
 // address we will assign sensors
 #define LOX1_ADDRESS 0x30
@@ -41,17 +40,23 @@ VL53L0X_RangingMeasurementData_t measure1;
 VL53L0X_RangingMeasurementData_t measure2;
 VL53L0X_RangingMeasurementData_t measure3;
 
+void setupDist();
+void readDist();
+void _printDistInd(string nome, VL53L0X_RangingMeasurementData_t &);
+void printDist();
+
 void setupDist() {
+  
+  // Configura pinos xshut
   pinMode(DIST_XSHUT_1, OUTPUT);
   pinMode(DIST_XSHUT_2, OUTPUT);
   pinMode(DIST_XSHUT_3, OUTPUT);
-
+  
+  // Configura I2C
   Wire.begin(21, 22); 
 
-  setID();
-}
+  // Configura ID de cada sensor VL53L0X
 
-void setID() {
   // all reset
   digitalWrite(DIST_XSHUT_1, LOW);    
   digitalWrite(DIST_XSHUT_2, LOW);
@@ -82,7 +87,6 @@ void setID() {
     Serial.println(F("Failed to boot second VL53L0X"));
     while(1);
   }
-  delay(10);
 
   // activating LOX3
   digitalWrite(DIST_XSHUT_3, HIGH);
@@ -92,60 +96,44 @@ void setID() {
     Serial.println(F("Failed to boot third VL53L0X"));
     while(1);
   }
-
 }
 
-// retorna leitura do sensor em milimetros
-#define MM(x) mm(&x)
-int mm(const VL53L0X_RangingMeasurementData_t *measure) {
-  return measure->RangeMilliMeter;
-}
-
-// TODO: fazer certo
-#define TARGET(x) target(&x)
-bool target(const VL53L0X_RangingMeasurementData_t *measure) {
-  return measure1.RangeStatus == 4 || mm(measure) < 100;
-}
-
-void readSensores(bool print) {
+void readDist() {
   
   lox1.rangingTest(&measure1, false); // pass in 'true' to get debug data printout!
   lox2.rangingTest(&measure2, false); // pass in 'true' to get debug data printout!
   lox3.rangingTest(&measure3, false); // pass in 'true' to get debug data printout!
 
-  if(!print) return;
+}
+
+void _printDistInd(string nome, VL53L0X_RangingMeasurementData_t &measurex) {
+
+  // print sensor reading
+  Serial.print(nome);
+  Serial.print(": ");
+  if(measurex.RangeStatus != 4) {     // if not out of range
+    Serial.print(measurex.RangeMilliMeter);
+  } else {
+    Serial.print("Out of range");
+  }
+  
+  Serial.print(" ");
+}
+void printDist() {
 
   // print sensor one reading
-  Serial.print("1: ");
-  if(measure1.RangeStatus != 4) {     // if not out of range
-    Serial.print(MM(measure1));
-  } else {
-    Serial.print("Out of range");
-  }
-  
-  Serial.print(" ");
+  _printDistInd("1", measure1);
 
   // print sensor two reading
-  Serial.print("2: ");
-  if(measure2.RangeStatus != 4) {
-    Serial.print(MM(measure2));
-  } else {
-    Serial.print("Out of range");
-  }
-  
-  Serial.print(" ");
+  _printDistInd("2", measure2);
 
   // print sensor three reading
-  Serial.print("3: ");
-  if(measure3.RangeStatus != 4) {
-    Serial.print(MM(measure3));
-  } else {
-    Serial.print("Out of range");
-  }
+  _printDistInd("3", measure3);
   
   Serial.println();
+
 }
-//================================================================================================
+
 //================================================================================================
 
 void setup() {
@@ -158,10 +146,10 @@ void setup() {
 
 void loop() {
 
-  read_triple_sensors();
+  readDist();
+  printDist();
   delay(10);
 
 }
 
-
-
+//================================================================================================
